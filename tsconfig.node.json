@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+    },
+    "include": ["src/cli.ts", "src/steps.ts"],
+    "exclude": [ "**/*.d.ts", "templates" ]
+}

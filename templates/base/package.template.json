@@ -1,0 +1,27 @@
+{
+  "name": "<%= name %>",
+  "version": "0.0.0",
+  "private": true,
+  "description": "<%= description %>",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
+  },
+  "keywords": [],
+  "author": "<%= author %> <<%= email %>>",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.21.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.4",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "turbo": "^1.6.3",
+    "typescript": "^4.5.4"
+  },
+  "workspaces": [
+    "apps"
+  ]
+}
