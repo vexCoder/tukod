@@ -40,6 +40,10 @@ export const createTestDir = async (
     await fs.writeJSON(pkgPath, {
       name,
       workspaces: ["packages/*"],
+      vx: {
+        workspaces: ["packages/*"],
+        templatesPaths: [""],
+      },
       ...(options?.pkg || []),
     } as PackageJson);
   }

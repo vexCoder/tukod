@@ -5,6 +5,8 @@
 		"moduleResolution": "node",
         "outDir": "./dist",
         "resolveJsonModule": true,
+        "declaration": true,
+        "inlineSourceMap": true,
         "jsx": "react"
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],

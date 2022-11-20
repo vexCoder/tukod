@@ -14,6 +14,7 @@ import {
   getPkg,
   getProjectRoot,
   setPkg,
+  getTemplateList,
 } from "../utils.js";
 import Operation from "./operation.js";
 
@@ -165,7 +166,7 @@ class GenerateOperation extends Operation<Commands.generate> {
   private appendToWorkspace() {
     if (this.values.isRoot) {
       const pkg = getPkg(this.values.root);
-      let workspaces = pkg.workspaces ?? [];
+      let workspaces = pkg?.workspaces ?? [];
       if (workspaces) {
         if (Array.isArray(workspaces)) {
           workspaces.push(this.values.name);

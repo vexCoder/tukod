@@ -1,7 +1,11 @@
 {
   "pipeline": {
       "build": {},
-      "lint": {},
-      "test": {}
+      "dev": {
+        "dependsOn": ["cli#build"]
+      },
+      "start": {
+        "dependsOn": ["cli#build"]
+      }
   }
 }

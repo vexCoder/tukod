@@ -1,8 +1,8 @@
 <div id="top"></div>
 
-# vx-cli
+# tukod
 
-> Personal CLI helper for vex-turbo-boilerplate
+> Yarn workspaces/monorepo mini cli helper tools
 
 <br />
 
@@ -11,11 +11,11 @@
 
 
 ```bash
-npm install -g vx
+npm install -g tukod
 ```
 **or**
 ```bash
-yarn global add vx
+yarn global add tukod
 ```
 
 
@@ -25,12 +25,12 @@ yarn global add vx
 
 ```bash
 Usage
-  $ vx <command> [options]
+  $ tukod <command> [options]
 
 Commands
   generate  Generate a new app
   delete    Remove an app
-  init      Initialize vex-turbo-boilerplate files
+  init      Create base files in the current directory
 
 Options
 
@@ -50,13 +50,13 @@ init
   --name, -n Monorepo project name 
 
 Examples
-  $ vx generate --template=react-app --name=my-app
-  $ vx init --namte=monorepo-name
+  $ tk generate --template=react-app --name=my-app
+  $ tk init --name=monorepo-name
 ```
 
-### **Adding Templates**
+### **Making Templates**
 ----------
-To add more templates you must add templatesPaths in the vx field of your root package.json. templatesPaths field should contain all your templates directory.
+To add templates you must add templatesPaths in the vx field of your root package.json. templatesPaths field should contain all your templates directory (can be absolute or relative to monorepo directory).
 
 Templates should have .vxignore so that it will be detected as a template. It should also have a package.json file.
 
@@ -64,13 +64,6 @@ Templates should have .vxignore so that it will be detected as a template. It sh
 ----------
 To delete apps you need to create an empty `.unlock` file in the app directory
 
-
-### **Templates**
-----------
-- with-node
-  - basic node application
-- with-vite-react
-  - basic react application with vite
 
 ### **Configuration**
 ----------
@@ -103,21 +96,13 @@ To delete apps you need to create an empty `.unlock` file in the app directory
 ## Roadmap
 
 - [x] Generate App
-  - [ ] Template Types
-    - [x] Node App
-    - [x] React Vite App
-    - [ ] NextJS App
-  - [x] Extra Template Paths
+  - [x] Template Paths
 - [x] Delete App
 - [x] Initialize Base
-  - [ ] Base Types
-    - [x] Turbo Project
-    - [ ] Lerna Project
-    - [ ] Godot EcmaScript Project
 - [x] InkJS Renderer
   - [x] Operations
   - [ ] Replace Inquirer.JS
-- [ ] Add Publish Script
+- [x] Add Publish Script
 
 <br/>
 

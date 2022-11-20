@@ -1,7 +1,0 @@
-{
-  "extends": [],
-  "rules": {
-    "no-console": "off",
-    "no-plusplus": "off"
-  }
-}

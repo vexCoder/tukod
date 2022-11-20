@@ -33,7 +33,7 @@ abstract class Operation<T extends Commands> {
     return _.first(this.templates);
   }
 
-  get appsWithPath() {
+  get appsWithPath(): ReturnType<typeof getWorkspaceApps> {
     return getWorkspaceApps(this.root);
   }
 
@@ -53,7 +53,7 @@ abstract class Operation<T extends Commands> {
     return _.first(this.workspaces);
   }
 
-  get buildPrompt() {
+  get buildPrompt(): ReturnType<typeof getSteps>[T] {
     const step = getSteps({
       cli: this.cli,
       disableConfirm: this.override?.disableConfirm || !this.cli.confirm,

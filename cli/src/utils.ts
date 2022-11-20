@@ -8,6 +8,7 @@ import { dirname, join, normalize } from "path";
 import { PackageJson } from "type-fest";
 import { fileURLToPath } from "url";
 import { CliSettings, SpinnerOptions, VXPackageJSON } from "./types/index.js";
+import path from 'path'
 
 export const setRoot = (path?: string) => {
   const newRoot = path ? normalize(path) : process.cwd();
@@ -71,7 +72,7 @@ export const getProjectRoot = (r?: string) => {
 
 export const getCliRoot = () => {
   const path = dirname(fileURLToPath(import.meta.url));
-  if (fs.pathExistsSync(join(path, "init"))) {
+  if (fs.pathExistsSync(join(path, "base"))) {
     return path;
   }
 
@@ -154,21 +155,24 @@ export const getTemplateList = (r?: string) => {
     name,
   }));
 
-  let templates = fs
-    .readdirSync(join(root, "templates"))
-    .map(map(join(root, "templates")));
+  let templates = []
   let additional = [];
   const vxtemplates = pkg?.vx?.templatesPaths ?? [];
   if (vxtemplates && Array.isArray(vxtemplates) && vxtemplates.length) {
     for (let i = 0; i < vxtemplates.length; i++) {
       const dir = vxtemplates[i];
-      const templatesPath = join(projectRoot, dir);
+      const isAbsolute = path.isAbsolute(dir);
+      const templatesPath = isAbsolute ? dir : join(projectRoot, dir);
+      const stat = fs.lstatSync(templatesPath);
+      if(!stat.isDirectory()) throw new Error(`Path ${templatesPath} is not a valid directory`);
       const list = fs.readdirSync(templatesPath).map(map(templatesPath));
       additional = additional.concat(list);
     }
   }
 
   if (additional.length) templates = templates.concat(additional);
+
+  if(!templates.length) throw new Error("No templates found");
 
   return templates;
 };
@@ -297,7 +301,7 @@ export const directoryTraversal = async <T = string>(
 };
 
 export const getInitFiles = async (destination: string) => {
-  const root = join(getCliRoot(), "templates", "base");
+  const root = join(getCliRoot(), "base");
   const files = await directoryTraversal(
     root,
     ["**/*", "!**/node_modules/**"],
