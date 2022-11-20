@@ -5,6 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "fi": "npx rimraf **/node_modules/** && npx rimraf yarn.lock && yarn install",
     "build": "turbo run build --filter=cli",
     "lint": "turbo run lint --filter=cli",
     "prod": "turbo run build start --filter=cli --filter=publish",

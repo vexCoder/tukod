@@ -5,8 +5,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start": "node --no-warnings --loader ts-node/esm src/index.ts --prod",
-    "dev": "node --no-warnings --loader ts-node/esm src/index.ts"
+    "start": "node --no-warnings --loader ts-node/esm src/publish.ts --prod",
+    "dev": "node --no-warnings --loader ts-node/esm src/publish.ts --test"
   },
   "keywords": [],
   "author": "",

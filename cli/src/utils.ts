@@ -30,7 +30,7 @@ export const getPkg = (path?: string) => {
   return pkg as VXPackageJSON;
 };
 
-export const setPkg = (path?: string, values: Partial<PackageJson> = {}) => {
+export const setPkg = (path?: string, values: Partial<VXPackageJSON> = {}) => {
   if (!path) return;
   let pkg = getPkg(path) ?? {};
   fs.writeJSONSync(
@@ -164,15 +164,13 @@ export const getTemplateList = (r?: string) => {
       const isAbsolute = path.isAbsolute(dir);
       const templatesPath = isAbsolute ? dir : join(projectRoot, dir);
       const stat = fs.lstatSync(templatesPath);
-      if(!stat.isDirectory()) throw new Error(`Path ${templatesPath} is not a valid directory`);
+      if(!stat.isDirectory() && !stat.isSymbolicLink()) throw new Error(`Path ${templatesPath} is not a valid directory`);
       const list = fs.readdirSync(templatesPath).map(map(templatesPath));
       additional = additional.concat(list);
     }
   }
 
   if (additional.length) templates = templates.concat(additional);
-
-  if(!templates.length) throw new Error("No templates found");
 
   return templates;
 };
@@ -187,7 +185,7 @@ export const getPkgWorkspace = (r?: string) => {
   return workspaces || [];
 };
 
-export const getWorkspaceList = (r?: string) => {
+export const getWorkspaceList = (r?: string, withRoot?: boolean) => {
   const workspaces = getPkgWorkspace(r);
   if (workspaces.length) {
     const sanitizedWorkspaces = workspaces.reduce((p, c) => {
@@ -195,7 +193,10 @@ export const getWorkspaceList = (r?: string) => {
       if (pathSplitArray.length > 1 && _.last(pathSplitArray) === "*") {
         pathSplitArray.pop();
         return [...p, pathSplitArray.join("/")];
+      } else if (withRoot) {
+        return [...p, c];
       }
+
       return p;
     }, [] as string[]);
 

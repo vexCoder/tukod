@@ -12,10 +12,14 @@ const main = async () => {
     flags: {
       prod: { type: "boolean", default: false },
       type: { type: "string", default: "patch" },
+      test: { type: "boolean", default: false },
+      nopublish: { type: "boolean", default: false },
     },
   });
 
   const isDev = !cli.flags.prod;
+  const isTest = cli.flags.test;
+  const isPublish = !cli.flags.nopublish;
   const root = path.resolve(process.cwd(), "..");
   const buildPath = path.resolve(root, ".build");
   const cliBuildPath = path.resolve(root, "cli", "dist");
@@ -33,7 +37,9 @@ const main = async () => {
     path.resolve(root, "package.json")
   )) as PackageJson;
   const version = pkg.version;
-  const newVersion = isDev ? version : semver.inc(version, cli.flags.type);
+  const newVersion = (isDev || isTest) ? 
+    semver.inc(version, 'prerelease', isTest ? 'alpha' : 'beta') : 
+    semver.inc(version, cli.flags.type as semver.ReleaseType);
 
   await fs.writeJSON(
     path.resolve(buildPath, "package.json"),
@@ -41,6 +47,7 @@ const main = async () => {
       name: "tukod",
       description: "monorepo mini helper tools",
       author: "vexCoder <freelance.starterpack08@gmail.com>",
+      type: "module",
       version: newVersion,
       bugs: {
         url: "https://github.com/vexCoder/tukod/issues",
@@ -64,10 +71,22 @@ const main = async () => {
     { spaces: 2 }
   );
 
-  await execa("yarn", ["publish", "--access", "public"], {
-    stdio: "inherit",
-    cwd: buildPath,
-  });
+  let args = [
+    "publish", 
+    "--access", 
+    isTest ? "public" : "restricted",
+  ]
+
+  if(isTest) args = args.concat(["--tag", "beta"])
+
+  console.log(newVersion)
+
+  if(isPublish) {
+    await execa("yarn", args, {
+      stdio: "inherit",
+      cwd: buildPath,
+    });
+  }
 };
 
 main().catch(console.error);

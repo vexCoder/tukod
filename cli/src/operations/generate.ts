@@ -40,6 +40,10 @@ class GenerateOperation extends Operation<Commands.generate> {
       throw new Error("Template does not exist");
     }
 
+    if (!this.templates.length) {
+      throw new Error("No templates found");
+    }
+
     const nameMatch = /[^a-z_-]/g.test(name || "");
     if (nameMatch || name.length <= 2) {
       throw new Error(
@@ -75,6 +79,10 @@ class GenerateOperation extends Operation<Commands.generate> {
   }
 
   public async prompt() {
+    if (!this.templates.length) {
+      throw new Error("No templates found");
+    }
+
     const answers = await this.buildPrompt({
       templates: this.templates,
       workspaces: [...this.workspaces, "root"],
@@ -177,8 +185,19 @@ class GenerateOperation extends Operation<Commands.generate> {
         workspaces = [this.values.name];
       }
 
+      let vxWorkspaces = pkg?.vx?.workspaces ?? [];
+      if (vxWorkspaces) {
+        vxWorkspaces.push(this.values.name);
+      }else {
+        vxWorkspaces = [this.values.name];
+      }
+
       setPkg(this.values.root, {
         workspaces,
+        vx: {
+          ...pkg?.vx,
+          workspaces: vxWorkspaces
+        }
       });
     }
   }

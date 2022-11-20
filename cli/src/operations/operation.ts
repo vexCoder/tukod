@@ -49,6 +49,10 @@ abstract class Operation<T extends Commands> {
     return getWorkspaceList(this.root);
   }
 
+  get workspacesWithRoot() {
+    return getWorkspaceList(this.root, true);
+  }
+
   get defaultWorkspace() {
     return _.first(this.workspaces);
   }

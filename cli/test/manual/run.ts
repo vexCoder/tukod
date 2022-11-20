@@ -4,10 +4,7 @@ import { createTestDir } from "../utils/generator.js";
 
 // Add more options here
 const main = async () => {
-  const { dir } = await createTestDir("manual-test", {
-    removeDir: true,
-    removePkg: true,
-  });
+  const { dir } = await createTestDir("manual-test", {});
 
   const cli = new Cli(dir);
 

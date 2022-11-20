@@ -42,7 +42,7 @@ export const createTestDir = async (
       workspaces: ["packages/*"],
       vx: {
         workspaces: ["packages/*"],
-        templatesPaths: [""],
+        templatesPaths: ["W:\\Projects\\tukod\\templates"],
       },
       ...(options?.pkg || []),
     } as PackageJson);

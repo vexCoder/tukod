@@ -10,7 +10,7 @@ import {
   OpSettings,
   OverrideSettings,
 } from "../types/index.js";
-import { directoryTraversal, getPkg } from "../utils.js";
+import { directoryTraversal, getPkg, getProjectRoot, setPkg } from "../utils.js";
 import Operation from "./operation.js";
 
 class DeleteOperation extends Operation<Commands.delete> {
@@ -25,6 +25,8 @@ class DeleteOperation extends Operation<Commands.delete> {
   public async verify(options?: DeleteProxy) {
     const path = options?.path ?? this.proxy.path;
     const name = options?.name ?? this.proxy.name;
+    const isRoot = options?.isRoot ?? this.proxy.isRoot;
+    const root = options?.root ?? this.proxy.root;
 
     if (!path || !(await fs.pathExists(path || "."))) {
       throw new Error("Invalid path");
@@ -50,6 +52,8 @@ class DeleteOperation extends Operation<Commands.delete> {
 
     this.values.name = name;
     this.values.path = path;
+    this.values.isRoot = isRoot;
+    this.values.root = root;
   }
 
   public async prompt(override?: OverrideSettings) {
@@ -66,9 +70,13 @@ class DeleteOperation extends Operation<Commands.delete> {
 
     const name = override?.name ?? this.cli.name ?? answers.app;
     const findApp = this.appsWithPath.find((v) => v.name === name);
+    const isRoot = this.workspacesWithRoot.includes(name);
+    const root = this.root ?? getProjectRoot();
 
+    this.proxy.root = root;
     this.proxy.path = findApp?.path;
     this.proxy.name = findApp?.name;
+    this.proxy.isRoot = isRoot;
   }
 
   async getFiles(path?: string) {
@@ -129,6 +137,38 @@ class DeleteOperation extends Operation<Commands.delete> {
     t.setStatus("success");
     return deleted;
   }
+  
+  private removeFromWorkspace() {
+    if (this.values.isRoot) {
+      const pkg = getPkg(this.values.root);
+      let workspaces = pkg?.workspaces ?? [];
+      let isInWorkspace = false;
+      if (workspaces) {
+        if (Array.isArray(workspaces)) {
+          isInWorkspace = workspaces.includes(this.values.name);
+          if(isInWorkspace) workspaces = workspaces.filter(v => v !== this.values.name);
+        } else {
+          isInWorkspace = workspaces.packages.includes(this.values.name);
+          workspaces.packages.push(this.values.name);
+          if(isInWorkspace) workspaces.packages = workspaces.packages.filter(v => v !== this.values.name);
+        }
+      }
+
+      let vxWorkspaces = pkg?.vx?.workspaces ?? [];
+      if (vxWorkspaces) {
+        isInWorkspace = vxWorkspaces.includes(this.values.name);
+        if(isInWorkspace) vxWorkspaces = vxWorkspaces.filter(v => v !== this.values.name);
+      }
+
+      setPkg(this.values.root, {
+        workspaces,
+        vx: {
+          ...pkg?.vx,
+          workspaces: vxWorkspaces
+        }
+      });
+    }
+  }
 
   process = async () => {
     const pipeline = task("Deleting files", ({ task }) => {
@@ -137,6 +177,7 @@ class DeleteOperation extends Operation<Commands.delete> {
       });
 
       task("Deleting", async (t) => {
+        this.removeFromWorkspace();
         await this.deleteFiles(t);
         await fs.rmdir(this.values.path);
       });

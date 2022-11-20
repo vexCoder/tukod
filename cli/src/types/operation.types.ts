@@ -41,10 +41,14 @@ export interface GenerateProxy {
 export interface DeleteValues {
   path: string;
   name: string;
+  root?: string;
+  isRoot?: boolean;
 }
 export interface DeleteProxy {
   path?: string;
   name?: string;
+  root?: string;
+  isRoot?: boolean;
 }
 
 export interface InitValues {

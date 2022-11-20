@@ -4,11 +4,8 @@
         "target": "esnext",
 		"moduleResolution": "node",
         "outDir": "./dist",
-        "resolveJsonModule": true,
-        "declaration": true,
-        "inlineSourceMap": true,
         "jsx": "react"
     },
     "include": ["src/**/*.ts", "src/**/*.tsx"],
-    "exclude": [ ]
+    "exclude": ["**/node_modules/*"]
 }
