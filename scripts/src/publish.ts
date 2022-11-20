@@ -20,13 +20,11 @@ export const getAllPkg = async (root?: string) => {
 interface PublishOptions {
   prod?: boolean;
   type?: semver.ReleaseType;
-  test?: boolean;
   nopublish?: boolean;
 }
 
 const publish = async (cli: Utils.CLI<PublishOptions>) => {
   const isDev = !cli.flags.prod;
-  const isTest = cli.flags.test;
   const isPublish = !cli.flags.nopublish;
   const root = path.resolve(process.cwd(), "..");
   const buildPath = path.resolve(root, ".build");
@@ -46,8 +44,8 @@ const publish = async (cli: Utils.CLI<PublishOptions>) => {
   )) as PackageJson;
   const version = pkg.version;
   const newVersion =
-    isDev || isTest
-      ? semver.inc(version, "prerelease", isTest ? "alpha" : "beta")
+    isDev
+      ? semver.inc(version, "prerelease", "alpha")
       : semver.inc(version, cli.flags.type as semver.ReleaseType);
 
   await fs.writeJSON(
@@ -80,9 +78,9 @@ const publish = async (cli: Utils.CLI<PublishOptions>) => {
     { spaces: 2 }
   );
 
-  let args = ["publish", "--access", isTest ? "public" : "restricted"];
+  let args = ["publish", "--access", isDev ? "restricted" : "public"];
 
-  if (isTest) args = args.concat(["--tag", "beta"]);
+  if (isDev) args = args.concat(["--tag", "beta"]);
 
   console.log(newVersion);
 

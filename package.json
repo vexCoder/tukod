@@ -1,6 +1,6 @@
 {
   "name": "tukod",
-  "version": "0.0.0-alpha.2",
+  "version": "0.1.0",
   "description": "CLI manager for vex-turbo-boilerplate",
   "type": "module",
   "private": true,
@@ -8,8 +8,8 @@
     "fi": "npx rimraf **/node_modules/** && npx rimraf yarn.lock && yarn install",
     "build": "turbo run build --color --filter=cli",
     "lint": "turbo run lint --color --filter=cli",
-    "pub": "turbo run build pub --color --filter=cli --filter=scripts",
-    "pub:dev": "turbo run build pub:dev --color --filter=cli --filter=scripts"
+    "pub": "yarn workspace cli build && yarn workspace scripts pub",
+    "pub:dev": "yarn workspace cli build && yarn workspace scripts pub:dev"
   },
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"

@@ -25,7 +25,7 @@ yarn global add tukod
 
 ```bash
 Usage
-  $ tukod <command> [options]
+  $ tk <command> [options]
 
 Commands
   generate  Generate a new app

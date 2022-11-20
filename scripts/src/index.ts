@@ -10,7 +10,6 @@ const main = async () => {
         // publish
         prod: { type: "boolean", default: false },
         type: { type: "string", default: "patch" },
-        test: { type: "boolean", default: false },
         nopublish: { type: "boolean", default: false },
 
         // unpublish
