@@ -1,22 +1,30 @@
 import path from "path";
 import fs from "fs-extra";
 import { PackageJson } from "type-fest";
-import meow from "meow";
+import meow, { Result, FlagType } from "meow";
 import semver from "semver";
 import pm from "p-map";
 import { execa } from "execa";
 
-const main = async () => {
-  const cli = meow(``, {
-    importMeta: import.meta,
-    flags: {
-      prod: { type: "boolean", default: false },
-      type: { type: "string", default: "patch" },
-      test: { type: "boolean", default: false },
-      nopublish: { type: "boolean", default: false },
-    },
-  });
+export const getAllPkg = async (root?: string) => {
+  const pkg = (await fs.readJSON(
+    path.resolve(root, "package.json")
+  )) as PackageJson;
 
+  const w = pkg.workspaces;
+  const workspaces: string[] = Array.isArray(w) ? w : w.packages;
+  const apps = workspaces.map((w) => path.resolve(root, w, "package.json"));
+  return apps.concat([path.resolve(root, "package.json")]);
+};
+
+interface PublishOptions {
+  prod?: boolean;
+  type?: semver.ReleaseType;
+  test?: boolean;
+  nopublish?: boolean;
+}
+
+const publish = async (cli: Utils.CLI<PublishOptions>) => {
   const isDev = !cli.flags.prod;
   const isTest = cli.flags.test;
   const isPublish = !cli.flags.nopublish;
@@ -37,9 +45,10 @@ const main = async () => {
     path.resolve(root, "package.json")
   )) as PackageJson;
   const version = pkg.version;
-  const newVersion = (isDev || isTest) ? 
-    semver.inc(version, 'prerelease', isTest ? 'alpha' : 'beta') : 
-    semver.inc(version, cli.flags.type as semver.ReleaseType);
+  const newVersion =
+    isDev || isTest
+      ? semver.inc(version, "prerelease", isTest ? "alpha" : "beta")
+      : semver.inc(version, cli.flags.type as semver.ReleaseType);
 
   await fs.writeJSON(
     path.resolve(buildPath, "package.json"),
@@ -71,22 +80,33 @@ const main = async () => {
     { spaces: 2 }
   );
 
-  let args = [
-    "publish", 
-    "--access", 
-    isTest ? "public" : "restricted",
-  ]
+  let args = ["publish", "--access", isTest ? "public" : "restricted"];
 
-  if(isTest) args = args.concat(["--tag", "beta"])
+  if (isTest) args = args.concat(["--tag", "beta"]);
 
-  console.log(newVersion)
+  console.log(newVersion);
 
-  if(isPublish) {
+  if (isPublish) {
     await execa("yarn", args, {
       stdio: "inherit",
       cwd: buildPath,
     });
+
+    const pkgs = await getAllPkg(root);
+    await pm(pkgs, async (p) => {
+      const pkg = (await fs.readJSON(p)) as PackageJson;
+      if (!pkg.version || !pkg.name) return;
+
+      await fs.writeJSON(
+        p,
+        {
+          ...pkg,
+          version: newVersion,
+        },
+        { flag: "", spaces: 2 }
+      );
+    });
   }
 };
 
-main().catch(console.error);
+export default publish;

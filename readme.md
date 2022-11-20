@@ -56,9 +56,20 @@ Examples
 
 ### **Making Templates**
 ----------
-To add templates you must add templatesPaths in the vx field of your root package.json. templatesPaths field should contain all your templates directory (can be absolute or relative to monorepo directory).
+To add templates you must add templatesPaths in the tk field of your root package.json. templatesPaths field should contain all your templates directory (can be absolute or relative to monorepo directory).
 
-Templates should have .vxignore so that it will be detected as a template. It should also have a package.json file.
+Templates should have .tkignore so that it will be detected as a template. It should also have a package.json file.
+
+```txt
+// sample .tkignore
+
+.turbo
+dist
+!node_modules/*
+node_modules
+
+
+```
 
 ### **Deleting Apps**
 ----------
@@ -70,14 +81,11 @@ To delete apps you need to create an empty `.unlock` file in the app directory
 ```json
 // package.json
 {
-    "vx": {
-        "workspaces": [
-            "apps",
-            "libs"
-        ],
-        "templatesPaths": [
+    "tk": {
+        "templates": [
           "path/to/additional/templates_list_1",
-          "path/to/additional/templates_list_2"
+          "path/to/additional/templates_list_2",
+          "P:/absolute/path/to/additional/templates_list_3"
         ]
     }
 }
@@ -97,8 +105,10 @@ To delete apps you need to create an empty `.unlock` file in the app directory
 
 - [x] Generate App
   - [x] Template Paths
+  - [ ] Remote Templates
 - [x] Delete App
 - [x] Initialize Base
+  - [ ] Base Types
 - [x] InkJS Renderer
   - [x] Operations
   - [ ] Replace Inquirer.JS

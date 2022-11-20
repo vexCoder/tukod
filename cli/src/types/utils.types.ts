@@ -15,9 +15,8 @@ export interface SpinnerOptions<T, Z> extends Pmap.Options {
   messager?: (p: T) => void;
 }
 
-export interface VX {
-  workspaces?: string[];
-  templatesPaths?: string[];
+export interface TK {
+  templates?: string[];
 }
 
-export type VXPackageJSON = PackageJson & { vx?: VX };
+export type TKPackageJSON = PackageJson & { tk?: TK };

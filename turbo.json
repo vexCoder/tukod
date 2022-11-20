@@ -1,10 +1,10 @@
 {
   "pipeline": {
       "build": {},
-      "dev": {
+      "pub:dev": {
         "dependsOn": ["cli#build"]
       },
-      "start": {
+      "pub": {
         "dependsOn": ["cli#build"]
       }
   }

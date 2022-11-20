@@ -7,12 +7,12 @@ import GenerateOperation from "../../src/operations/generate.js";
 import { getCli } from "../../src/utils.js";
 import { getTestDir } from "./utils.js";
 import InitOperation from "../../src/operations/init.js";
-import { VXPackageJSON } from "../../src/types/utils.types.js";
+import { TKPackageJSON } from "../../src/types/utils.types.js";
 
 interface CreateTestDirOptions {
   removeDir?: boolean;
   removePkg?: boolean;
-  pkg?: VXPackageJSON;
+  pkg?: TKPackageJSON;
 }
 
 export type CreateTestDirValue = {
@@ -40,9 +40,9 @@ export const createTestDir = async (
     await fs.writeJSON(pkgPath, {
       name,
       workspaces: ["packages/*"],
-      vx: {
+      tk: {
         workspaces: ["packages/*"],
-        templatesPaths: ["W:\\Projects\\tukod\\templates"],
+        templates: ["W:\\Projects\\tukod\\templates"],
       },
       ...(options?.pkg || []),
     } as PackageJson);

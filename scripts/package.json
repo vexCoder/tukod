@@ -1,12 +1,13 @@
 {
-  "name": "publish",
-  "version": "0.0.0",
+  "name": "scripts",
+  "version": "0.0.0-alpha.2",
   "type": "module",
   "description": "",
   "private": true,
   "scripts": {
-    "start": "node --no-warnings --loader ts-node/esm src/publish.ts --prod",
-    "dev": "node --no-warnings --loader ts-node/esm src/publish.ts --test"
+    "pub": "ts-node --esm --files src/index.ts publish --prod",
+    "pub:dev": "ts-node --esm --files src/index.ts publish --test",
+    "unpub": "ts-node --esm --files src/index.ts unpublish --version"
   },
   "keywords": [],
   "author": "",

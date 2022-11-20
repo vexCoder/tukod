@@ -61,7 +61,7 @@ interface ProgressionProps {
   play?: boolean;
 }
 
-function Progression({ progress, rate = 30, play }: ProgressionProps) {
+function Progression({ progress, rate = 60, play }: ProgressionProps) {
   const [lastProgress, setLastProgress] = React.useState(0);
   const [value, setValue] = React.useState(0);
 

@@ -7,7 +7,7 @@ import pMap from "p-map";
 import { dirname, join, normalize } from "path";
 import { PackageJson } from "type-fest";
 import { fileURLToPath } from "url";
-import { CliSettings, SpinnerOptions, VXPackageJSON } from "./types/index.js";
+import { CliSettings, SpinnerOptions, TKPackageJSON } from "./types/index.js";
 import path from 'path'
 
 export const setRoot = (path?: string) => {
@@ -27,10 +27,10 @@ export const getPkg = (path?: string) => {
   const pkgPath = join(path, "package.json");
   if (!fs.pathExistsSync(pkgPath)) return;
   const pkg = fs.readJSONSync(pkgPath);
-  return pkg as VXPackageJSON;
+  return pkg as TKPackageJSON;
 };
 
-export const setPkg = (path?: string, values: Partial<VXPackageJSON> = {}) => {
+export const setPkg = (path?: string, values: Partial<TKPackageJSON> = {}) => {
   if (!path) return;
   let pkg = getPkg(path) ?? {};
   fs.writeJSONSync(
@@ -83,7 +83,7 @@ export const getCli = (...argv: string[]): CliSettings => {
   const cli = meow(
     dedent(`
     Usage
-      $ vx <command> [options]
+      $ tk <command> [options]
 
     Commands
       generate  Generate a new app
@@ -108,8 +108,8 @@ export const getCli = (...argv: string[]): CliSettings => {
       --name, -n Monorepo project name 
 
     Examples
-      $ vx generate --template=react-app --name=my-app
-      $ vx init --name=monorepo-name
+      $ tk generate --template=react-app --name=my-app
+      $ tk init --name=monorepo-name
         `),
     {
       importMeta: import.meta,
@@ -157,10 +157,10 @@ export const getTemplateList = (r?: string) => {
 
   let templates = []
   let additional = [];
-  const vxtemplates = pkg?.vx?.templatesPaths ?? [];
-  if (vxtemplates && Array.isArray(vxtemplates) && vxtemplates.length) {
-    for (let i = 0; i < vxtemplates.length; i++) {
-      const dir = vxtemplates[i];
+  const tktemplates = pkg?.tk?.templates ?? [];
+  if (tktemplates && Array.isArray(tktemplates) && tktemplates.length) {
+    for (let i = 0; i < tktemplates.length; i++) {
+      const dir = tktemplates[i];
       const isAbsolute = path.isAbsolute(dir);
       const templatesPath = isAbsolute ? dir : join(projectRoot, dir);
       const stat = fs.lstatSync(templatesPath);
@@ -179,7 +179,7 @@ export const getPkgWorkspace = (r?: string) => {
   const root = getProjectRoot(r);
   const pkg = getPkg(root);
 
-  const w = pkg.vx?.workspaces ?? pkg.workspaces;
+  const w = pkg.workspaces;
   const workspaces: string[] = Array.isArray(w) ? w : w.packages;
 
   return workspaces || [];

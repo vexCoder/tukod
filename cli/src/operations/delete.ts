@@ -154,18 +154,8 @@ class DeleteOperation extends Operation<Commands.delete> {
         }
       }
 
-      let vxWorkspaces = pkg?.vx?.workspaces ?? [];
-      if (vxWorkspaces) {
-        isInWorkspace = vxWorkspaces.includes(this.values.name);
-        if(isInWorkspace) vxWorkspaces = vxWorkspaces.filter(v => v !== this.values.name);
-      }
-
       setPkg(this.values.root, {
-        workspaces,
-        vx: {
-          ...pkg?.vx,
-          workspaces: vxWorkspaces
-        }
+        workspaces
       });
     }
   }

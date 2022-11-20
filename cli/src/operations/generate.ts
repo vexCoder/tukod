@@ -119,13 +119,13 @@ class GenerateOperation extends Operation<Commands.generate> {
 
   private async getTemplateFiles() {
     const { template, destination } = this.values;
-    const vxignorePath = join(template, ".vxignore");
-    if (!(await fs.pathExists(vxignorePath)))
-      throw new Error("Template does not have a .vxignore file");
+    const tkignorePath = join(template, ".tkignore");
+    if (!(await fs.pathExists(tkignorePath)))
+      throw new Error("Template does not have a .tkignore file");
 
-    const matcher = await fs.readFile(vxignorePath, "utf8");
+    const matcher = await fs.readFile(tkignorePath, "utf8");
     const matchGlob = matcher.split("\n").map((v) => v.trim());
-    matchGlob.push(".vxignore");
+    matchGlob.push(".tkignore");
 
     const map = async (v, dir) => ({
       name: v,
@@ -159,11 +159,6 @@ class GenerateOperation extends Operation<Commands.generate> {
 
   private moveFile = async (v: FileConfig) => {
     const { src, dest } = v;
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 2000);
-    });
     await fs.mkdirp(dirname(dest));
     await fs.copy(src, dest);
     this.filesCopied.push(v);
@@ -185,19 +180,8 @@ class GenerateOperation extends Operation<Commands.generate> {
         workspaces = [this.values.name];
       }
 
-      let vxWorkspaces = pkg?.vx?.workspaces ?? [];
-      if (vxWorkspaces) {
-        vxWorkspaces.push(this.values.name);
-      }else {
-        vxWorkspaces = [this.values.name];
-      }
-
       setPkg(this.values.root, {
-        workspaces,
-        vx: {
-          ...pkg?.vx,
-          workspaces: vxWorkspaces
-        }
+        workspaces
       });
     }
   }
