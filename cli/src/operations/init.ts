@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import pMap from "p-map";
-import { basename } from "path";
+import { basename, join } from "path";
 import { render, task, TaskManagerApi } from "../task/taskManager.js";
 import {
   Commands,
@@ -9,7 +9,7 @@ import {
   OpSettings,
   OverrideSettings,
 } from "../types/index.js";
-import { getInitFiles, getPkg, setPkg } from "../utils.js";
+import { directoryTraversal, getInitFiles, getPkg, setPkg } from "../utils.js";
 import Operation from "./operation.js";
 
 class InitOperation extends Operation<Commands.init> {
@@ -21,7 +21,12 @@ class InitOperation extends Operation<Commands.init> {
     const currentDir = path ?? this.proxy.path;
     const name = nm ?? this.proxy.name;
 
-    const files = await fs.readdir(currentDir);
+    const files = await directoryTraversal(
+      currentDir,
+      ["!^.+$"],
+      async (v, dir) => join(dir, v)
+    );
+
     if (files.length > 0) {
       throw new Error("Current directory is not empty");
     }

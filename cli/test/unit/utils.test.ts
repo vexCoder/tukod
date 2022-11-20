@@ -1,6 +1,5 @@
 import test from "ava";
-import fs from "fs-extra";
-import { join } from "path";
+import { join, resolve } from "path";
 import Cli from "../../src/cli.js";
 import {
   getCli,
@@ -33,7 +32,7 @@ test("get project root", (t) => {
 
 test("get cli root", (t) => {
   const root = getCliRoot();
-  t.is(root, join(mainRoot, ".."));
+  t.is(root, join(mainRoot));
 });
 
 test("set root", (t) => {
@@ -95,7 +94,7 @@ test("verify cli invalid command", async (t) => {
 });
 
 test("get templates", (t) => {
-  const templates = getTemplateList();
+  const templates = getTemplateList(resolve(mainRoot, ".."), ["./templates"]);
 
   t.true(templates.length > 0);
   t.true(templates.map((v) => v.name).includes("with-vite-react"));
@@ -103,27 +102,24 @@ test("get templates", (t) => {
 });
 
 test("get workspaces", (t) => {
-  const types = getWorkspaceList();
+  const types = getWorkspaceList(undefined, undefined, {
+    packages: ["templates/*"],
+  });
 
   t.is(types.length, 1);
   t.is(types[0], "templates");
 });
 
 test("get workspace apps", (t) => {
-  const root = getCliRoot();
-  const types = getWorkspaceApps(root, "templates");
-  const workspaceDir = fs.readdirSync(join(root, "templates"));
+  const types = getWorkspaceApps(
+    "./",
+    undefined,
+    {
+      packages: ["template-1"],
+    },
+    true
+  );
 
-  t.is(types.length, workspaceDir.length);
-  t.true(!!types.find((v) => v.name === workspaceDir[0]));
-});
-
-test("get all workspaces apps", (t) => {
-  const root = getCliRoot();
-  const types = getWorkspaceApps();
-  const workspaceDir = fs.readdirSync(join(root, "templates"));
-
-  t.log(root, types);
-  t.is(types.length, 2 + workspaceDir.length);
-  t.true(!!types.find((v) => v.name === workspaceDir[0]));
+  t.is(types.length, 1);
+  t.is(types[0].name, "template-1");
 });

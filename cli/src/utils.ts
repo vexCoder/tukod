@@ -8,7 +8,7 @@ import { dirname, join, normalize } from "path";
 import { PackageJson } from "type-fest";
 import { fileURLToPath } from "url";
 import { CliSettings, SpinnerOptions, TKPackageJSON } from "./types/index.js";
-import path from 'path'
+import path from "path";
 
 export const setRoot = (path?: string) => {
   const newRoot = path ? normalize(path) : process.cwd();
@@ -76,7 +76,7 @@ export const getCliRoot = () => {
     return path;
   }
 
-  return join(path, "..", "..");
+  return join(path, "..");
 };
 
 export const getCli = (...argv: string[]): CliSettings => {
@@ -145,26 +145,26 @@ export const getCli = (...argv: string[]): CliSettings => {
   };
 };
 
-export const getTemplateList = (r?: string) => {
+export const getTemplateList = (r?: string, templatePaths?: string[]) => {
   const projectRoot = getProjectRoot(r);
   const pkg = getPkg(projectRoot);
-  const root = getCliRoot();
 
   const map = _.curry((path: string, name: string) => ({
     value: join(path, name),
     name,
   }));
 
-  let templates = []
+  let templates = [];
   let additional = [];
-  const tktemplates = pkg?.tk?.templates ?? [];
+  const tktemplates = templatePaths ?? pkg?.tk?.templates ?? [];
   if (tktemplates && Array.isArray(tktemplates) && tktemplates.length) {
     for (let i = 0; i < tktemplates.length; i++) {
       const dir = tktemplates[i];
       const isAbsolute = path.isAbsolute(dir);
       const templatesPath = isAbsolute ? dir : join(projectRoot, dir);
       const stat = fs.lstatSync(templatesPath);
-      if(!stat.isDirectory() && !stat.isSymbolicLink()) throw new Error(`Path ${templatesPath} is not a valid directory`);
+      if (!stat.isDirectory() && !stat.isSymbolicLink())
+        throw new Error(`Path ${templatesPath} is not a valid directory`);
       const list = fs.readdirSync(templatesPath).map(map(templatesPath));
       additional = additional.concat(list);
     }
@@ -175,18 +175,25 @@ export const getTemplateList = (r?: string) => {
   return templates;
 };
 
-export const getPkgWorkspace = (r?: string) => {
+export const getPkgWorkspace = (
+  r?: string,
+  forceWrkSpace?: PackageJson.WorkspaceConfig
+) => {
   const root = getProjectRoot(r);
   const pkg = getPkg(root);
 
-  const w = pkg.workspaces;
+  const w = forceWrkSpace ?? pkg.workspaces;
   const workspaces: string[] = Array.isArray(w) ? w : w.packages;
 
   return workspaces || [];
 };
 
-export const getWorkspaceList = (r?: string, withRoot?: boolean) => {
-  const workspaces = getPkgWorkspace(r);
+export const getWorkspaceList = (
+  r?: string,
+  withRoot?: boolean,
+  forceWrkSpace?: PackageJson.WorkspaceConfig
+) => {
+  const workspaces = getPkgWorkspace(r, forceWrkSpace);
   if (workspaces.length) {
     const sanitizedWorkspaces = workspaces.reduce((p, c) => {
       const pathSplitArray = c.split("/");
@@ -233,10 +240,15 @@ export const getAllDirectoryWithPkg = (r?: string) => {
   return reduce;
 };
 
-export const getWorkspaceApps = (nroot?: string, workspace?: string) => {
+export const getWorkspaceApps = (
+  nroot?: string,
+  workspace?: string,
+  forceWrkSpace?: PackageJson.WorkspaceConfig,
+  noCheck?: boolean
+) => {
   const root = normalize(nroot ?? getProjectRoot());
-  const pkgWorkspaces = getPkgWorkspace(root);
-  const workspaces = getWorkspaceList(root);
+  const pkgWorkspaces = getPkgWorkspace(root, forceWrkSpace);
+  const workspaces = getWorkspaceList(root, false, forceWrkSpace);
 
   if (workspace && workspaces.includes(workspace)) {
     return fs.readdirSync(join(root, workspace)).map((v) => ({
@@ -265,6 +277,7 @@ export const getWorkspaceApps = (nroot?: string, workspace?: string) => {
       .reduce((p, c) => [...p, ...c], [] as { path: string; name: string }[])
       .concat(possibleApps);
 
+    if(noCheck) return apps;
     const dirWithPkg = getAllDirectoryWithPkg(root);
     const validApps = dirWithPkg.filter(
       (v) =>

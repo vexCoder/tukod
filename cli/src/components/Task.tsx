@@ -65,17 +65,22 @@ function Progression({ progress, rate = 60, play }: ProgressionProps) {
   const [lastProgress, setLastProgress] = React.useState(0);
   const [value, setValue] = React.useState(0);
 
-  const update = async (step: number) => {
+  const update = async (step: number, controller: AbortController) => {
     await new Promise<void>((resolve) =>
       setTimeout(() => {
         resolve();
       }, 1000 / rate)
     );
 
+    if(controller.signal.aborted) {
+      return
+    }
+
     setValue((value) => value + step);
   };
 
   React.useEffect(() => {
+    const controller = new AbortController();
     if (!play) return;
     if (value >= progress) {
       setLastProgress(progress);
@@ -83,7 +88,11 @@ function Progression({ progress, rate = 60, play }: ProgressionProps) {
     }
 
     const step = (progress - lastProgress) / rate;
-    update(step);
+    update(step, controller);
+
+    return () => {
+      controller.abort();
+    }
   }, [progress, value]);
 
   const color = Color.hsl(149, 64 * value, 50).hex();
